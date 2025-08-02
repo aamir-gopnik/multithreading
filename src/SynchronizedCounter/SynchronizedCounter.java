@@ -1,3 +1,5 @@
+package SynchronizedCounter;
+
 public class SynchronizedCounter {
 
     //private static int counter = 1;
