@@ -1,41 +1,21 @@
 package ProducerConsumer;
 
-
-import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
-
+import java.util.LinkedList;
+import java.util.Queue;
 public class MainClient {
 
     public static void main(String[] args) {
 
-        ArrayBlockingQueue<Integer> eventsMsg = new ArrayBlockingQueue<>(10);
-        Random random = new Random();
+        Queue<Integer> eventsMsgQueue = new LinkedList<>();
+        Producer p1 = new Producer(eventsMsgQueue);
+        Consumer c1 = new Consumer(eventsMsgQueue);
+        Consumer c2 = new Consumer(eventsMsgQueue);
+        Runnable r1 = p1::produceMessage;
+        Runnable r2 = c1::consumeMessage;
+        Runnable r3 = c2::consumeMessage;
 
-        Thread producer = new Thread(() -> {
-            while(eventsMsg.size() < 10) {
-                int num = random.nextInt() % 100;
-                try {
-                    eventsMsg.put(num);
-                    System.out.println("Data added to queue -> " + eventsMsg.peek());
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        Thread consumer = new Thread(() -> {
-            while(!eventsMsg.isEmpty()) {
-                try {
-                    Thread.sleep(1000);
-                    System.out.println("Consuming Data from queue -> " + eventsMsg.poll());
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        producer.start();
-        consumer.start();
+        new Thread(r1, "Producer").start();
+        new Thread(r2, "Consumer-1").start();
+        new Thread(r3, "Consumer-2").start();
     }
 }
